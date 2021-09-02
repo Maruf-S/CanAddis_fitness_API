@@ -18,7 +18,7 @@ const user_register = async(user_dets,role,res) =>{
         //     });
         // }
         //Validate email
-        let email_not_taken = await validate_username(user_dets.email);
+        let email_not_taken = await validate_email(user_dets.email);
         if(!email_not_taken){
             return res.status(400).json({
                 message:'email already taken.',
