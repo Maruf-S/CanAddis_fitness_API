@@ -11,11 +11,11 @@ const app = express();
 
 //Middlewares
 app.use(cors());
-app.use(bp.json());
+app.use(bp.json({limit: '50mb'}));
 app.use(passport.initialize());
-
 require("./middlewares/passport")(passport);
 //Routes
+app.use('/api/images', express.static('static_images'))
 app.use('/api/users',require('./routes/users'));
 //Configure the database connection
 const connect_app = connect(DB,

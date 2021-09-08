@@ -4,6 +4,8 @@ const moment = require('moment');
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
 const {SECRET} = require("../config");
+const fs = require("fs");
+const fsPromises = fs.promises;
 /**
  * @DESC Register Users
  */
@@ -18,6 +20,13 @@ const user_register = async(user_dets,role,res) =>{
         //     });
         // }
         //Validate email
+        //TODO Check for the sent image
+        user_dets.profile_image = "default_user.jpg";
+        if(user_dets.image_encoded!=null){
+            user_dets.profile_image = (Math.random() + 1).toString(36).substring(7);
+            var base64Data = user_dets.image_encoded.replace(/^data:image\/png;base64,/, "");
+            await fsPromises.writeFile("./static_images/"+user_dets.profile_image, base64Data, 'base64');
+        }
         let email_not_taken = await validate_email(user_dets.email);
         if(!email_not_taken){
             return res.status(400).json({
@@ -58,8 +67,9 @@ const user_login = async(user_creds,res) =>{
     let {email, password } = user_creds;
     // Check username
     const user = await User.findOne({email});
+    console.log(user_creds);
     if(!user){
-        return res.status(404).json({
+        return res.status(403).json({
             message:`There is not an account with this email`,
             success: false
         });
@@ -75,9 +85,7 @@ const user_login = async(user_creds,res) =>{
             },SECRET,{expiresIn: "15 days" }
         );
         let result =  {
-            username: user.username,
-            role: user.role,
-            email: user.email,
+            ...user.toObject(),
             token:`Bearer ${token}`,
             expiryDate: moment().add(200, 'hours')
         }

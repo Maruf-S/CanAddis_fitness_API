@@ -9,6 +9,10 @@ const UserSchema = new Schema({
     type: String,
     required: false,
   },
+  profile_image: {
+    type: String,
+    required: false,
+  },
   email: {
     type: String,
     required: true,
@@ -38,9 +42,9 @@ const UserSchema = new Schema({
     type: String,
   },
   age: {
-    type: String,
+    type: Number,
     default: null,
-    enum: [null, "12-17", "18-24", "25-34", "35-44", "45-54", "55+"],
+    // enum: [null, "12-17", "18-24", "25-34", "35-44", "45-54", "55+"],
   },
   gender: {
     type: String,

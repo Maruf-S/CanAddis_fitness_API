@@ -17,8 +17,9 @@ router.post("/login",async (req,res) =>{
 router.get("/profile",user_auth,role_auth([roles.TRAINEE,roles.TRAINER]),async (req,res) =>{
     return res.json(await User.findOne({_id:req.user._id}).select(["-password"]));
 })
-router.get("/current",user_auth,(req,res,next) =>{
-    return res.json(serialize_user(req.user));
+router.get("/current",user_auth, async(req,res,next) =>{
+    let user = await User.findById(req.user_id).select(["-password"]);
+    return res.json(user);
 })
 router.put('/update',user_auth,role_auth([roles.TRAINER,roles.TRAINEE]), async(req, res,next) => {
     return await update_user(req.user._id,req.body,res);
