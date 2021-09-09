@@ -17,6 +17,8 @@ require("./middlewares/passport")(passport);
 //Routes
 app.use('/api/images', express.static('static_images'))
 app.use('/api/users',require('./routes/users'));
+app.use('/api/plans',require('./routes/plans'));
+app.use('/api/user-plans',require('./routes/user_plans'));
 //Configure the database connection
 const connect_app = connect(DB,
     {useFindAndModify:true,
