@@ -31,7 +31,7 @@ const UserSchema = new Schema({
   },
   verified: {
     type: Boolean,
-    default: false,
+    default: true,
   },
   date_created: {
     type: Date,
