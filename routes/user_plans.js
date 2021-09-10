@@ -55,6 +55,7 @@ router.get('/',user_auth,role_auth([roles.TRAINER]), async(req, res,next) => {
         });
     }
 });
+
 // delete saved plans user
 router.delete('/:id',user_auth,role_auth([roles.TRAINEE]), async(req, res,next) => {
     try {

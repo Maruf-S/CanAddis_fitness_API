@@ -52,7 +52,7 @@ router.get('/',user_auth,role_auth([roles.TRAINER,roles.TRAINEE]), async(req, re
     let plans;
     try {
         if(req.query.title){
-            plans = await Plan.find({'plan.title':{ "$regex": req.query.title, "$options": "i" }}).populate('creator','_id email last_name first_name verified date_created bio age gender rating');
+            plans = await Plan.find({'title':{ "$regex": req.query.title, "$options": "i" }}).populate('creator','_id email last_name first_name verified date_created bio age gender rating');
         }
         else{
             plans = await Plan.find().populate('creator','_id email last_name first_name verified date_created bio age gender rating');
@@ -60,8 +60,10 @@ router.get('/',user_auth,role_auth([roles.TRAINER,roles.TRAINEE]), async(req, re
         if(plans.length==0){
             return res.status(404).json({
                 message: "You have no plans.",
-                success:true
+                success:true,
+                plans:[]
             });
+            //! What if we found 0 because we filtered stuff
         }
         return res.status(200).json({
             plans
