@@ -9,7 +9,7 @@ router.post('/',user_auth,role_auth([roles.TRAINER]), async(req, res,next) => {
         let plan = new Plan({...req.body});
         plan.creator = req.user._id;
         await plan.save();
-        await plan.populate('creator','_id email last_name first_name verified date_created bio age gender rating').execPopulate();
+        await plan.populate('creator','_id email last_name first_name verified date_created bio age gender rating profile_image').execPopulate();
         return res.status(201).json({
             message: "Plan created successfully.",
             success:true,
@@ -27,7 +27,7 @@ router.post('/',user_auth,role_auth([roles.TRAINER]), async(req, res,next) => {
 //GET
 router.get('/:id',user_auth,role_auth([roles.TRAINER,roles.TRAINEE]), async(req, res,next) => {
     try {
-        let plan = await Plan.findOne({_id:req.params.id}).populate('creator','_id email last_name first_name verified date_created bio age gender rating');
+        let plan = await Plan.findOne({_id:req.params.id}).populate('creator','_id email last_name first_name verified date_created bio age gender rating profile_image');
         if(plan==null){
             return res.status(404).json({
                 message: "Plan doesn't exist.",
@@ -52,10 +52,10 @@ router.get('/',user_auth,role_auth([roles.TRAINER,roles.TRAINEE]), async(req, re
     let plans;
     try {
         if(req.query.title){
-            plans = await Plan.find({'title':{ "$regex": req.query.title, "$options": "i" }}).populate('creator','_id email last_name first_name verified date_created bio age gender rating');
+            plans = await Plan.find({'title':{ "$regex": req.query.title, "$options": "i" }}).populate('creator','_id email last_name first_name verified date_created bio age gender rating profile_image');
         }
         else{
-            plans = await Plan.find().populate('creator','_id email last_name first_name verified date_created bio age gender rating');
+            plans = await Plan.find().populate('creator','_id email last_name first_name verified date_created bio age gender rating profile_image');
         }
         if(plans.length==0){
             return res.status(404).json({

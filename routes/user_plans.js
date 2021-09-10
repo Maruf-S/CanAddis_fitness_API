@@ -4,14 +4,14 @@ const {user_auth,role_auth} = require("../utils/auth");
 const Plan = require("../models/Plans");
 const UserPlan = require("../models/UserPlans");
 
-
+const User = require("../models/User");
 //! Trainee(user) adding and removing plans from here on
 //! Repeat
 // Add a user plan
 //! RETURNS 409 IF A PLAN IS ALREADY SAVED 
 router.post('/:plan_id',user_auth,role_auth([roles.TRAINEE]), async(req, res,next) => {
     try {
-        let check_dup  = await UserPlan.find({user:req.user._id,plan:req.params.plan_id});
+        let check_dup  = await UserPlan.findOne({user:req.user._id,plan:req.params.plan_id});
         if(check_dup!=null){
             return res.status(409).json({
                 message: "Plan is already saved.",
@@ -35,17 +35,26 @@ router.post('/:plan_id',user_auth,role_auth([roles.TRAINEE]), async(req, res,nex
     }
 });
 // get saved plans user
-router.get('/',user_auth,role_auth([roles.TRAINER]), async(req, res,next) => {
+router.get('/',user_auth,role_auth([roles.TRAINEE]), async(req, res,next) => {
     try {
-        let user_plans = await UserPlan.find({user:req.user._id}).populate('user','_id email last_name first_name verified date_created bio age gender rating').populate("plan");
+        let user_plans = await UserPlan.find({user:req.user._id}).populate('user','_id email last_name first_name verified date_created bio age gender rating').populate("plan")
+        .populate({
+            path: 'plan',
+            model: 'plans',
+            populate: {
+              path: 'creator',
+              model: 'users'
+            }
+          })
         if(user_plans.length==0){
             return res.status(204).json({
                 message: "You have no plans added.",
-                success:true
+                success:true,
+                plans:[]
             });
         }
         return res.status(200).json({
-            user_plans
+            plans:user_plans
         });
     } catch (error) {
         console.log(error);
@@ -59,8 +68,12 @@ router.get('/',user_auth,role_auth([roles.TRAINER]), async(req, res,next) => {
 // delete saved plans user
 router.delete('/:id',user_auth,role_auth([roles.TRAINEE]), async(req, res,next) => {
     try {
-        let x = UserPlan.deleteOne({user:req.user.id});
+        let x = await UserPlan.deleteOne({user:req.user._id,plan:req.params.id});
         console.log(x);
+        return res.status(200).json({
+            message: "Deleted successfully.",
+            success:true
+        });
 
     } catch (error) {
         console.log(error);
