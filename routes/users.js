@@ -19,7 +19,7 @@ router.get("/profile",user_auth,role_auth([roles.TRAINEE,roles.TRAINER]),async (
     return res.json(await User.findOne({_id:req.user._id}).select(["-password"]));
 })
 router.get("/current",user_auth, async(req,res,next) =>{
-    let user = await User.findById(req.user_id).select(["-password"]);
+    let user = await User.findById(req.user._id).select(["-password"]);
     return res.json(user);
 })
 router.put('/update',user_auth,role_auth([roles.TRAINER,roles.TRAINEE]), async(req, res,next) => {
@@ -28,6 +28,24 @@ router.put('/update',user_auth,role_auth([roles.TRAINER,roles.TRAINEE]), async(r
 router.put("/update-password",user_auth,role_auth([roles.TRAINER,roles.TRAINEE]), async (req,res,next) =>{
     return await change_password(req.user._id,req.body.old_password,req.body.new_password,res);
 })
+//DELETE USER
+router.delete('/',user_auth, async(req, res,next) => {
+    try {
+        let x = await User.deleteOne({_id:req.user._id});
+        console.log(x);
+        return res.status(200).json({
+            message: "Deleted successfully.",
+            success:true
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Error deleting.",
+            success:false
+        });
+    }
+});
 //!GET Plans THE TRAINER created
 router.get('/plans-created',user_auth,role_auth([roles.TRAINER]), async(req, res,next) => {
     try {
